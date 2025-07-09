@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokédex AR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Aponte a câmera para o marcador HIRO</div>
+
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+  <a-marker preset="hiro" id="hiro-marker">
+    <a-entity id="pokemon-card" position="0 0.25 0" visible="false">
+      <!-- Card Background -->
+      <a-plane
+        color="#fdfdfd"
+        height="2.2"
+        width="3.4"
+        position="0 1 0"
+        rotation="-90 0 0"
+        material="opacity: 0.98; shader: flat;"
+        shadow="receive: true">
+      </a-plane>
+
+      <!-- Pokémon Image -->
+      <a-image
+        id="pokemon-image"
+        src=""
+        position="-1.05 2 -0.01"
+        width="1.3"
+        height="1.3"
+        rotation="0 0 0"
+        animation="property: rotation; to: 0 360 0; loop: true; dur: 7000; easing: linear;">
+      </a-image>
+
+      <!-- Nome -->
+      <a-text
+        id="pokemon-name"
+        value="Nome do Pokémon"
+        position="0.1 2.5 -0.01"
+        align="left"
+        color="#111"
+        width="2.5"
+        font="kelsonsans"
+        baseline="top">
+      </a-text>
+
+      <!-- Tipo -->
+      <a-text
+        id="pokemon-types"
+        value="Tipo: Elétrico"
+        position="0.1 2.3 -0.01"
+        align="left"
+        color="#444"
+        width="2.5"
+        font="kelsonsans">
+      </a-text>
+
+      <!-- Altura e Peso -->
+      <a-text
+        id="pokemon-height-weight"
+        value="Altura: 0.8m\nPeso: 60kg"
+        position="0.1 2.1 -0.01"
+        align="left"
+        color="#555"
+        width="2.5"
+        font="kelsonsans"
+        white-space="pre">
+      </a-text>
+
+      <!-- Habilidades -->
+      <a-text
+        id="pokemon-abilities"
+        value="Habilidades:\n- Estático\n- Raio Interno"
+        position="0.1 1.75 -0.01"
+        align="left"
+        color="#444"
+        width="2.5"
+        font="kelsonsans"
+        white-space="pre">
+      </a-text>
+
+      <!-- Painel de Atributos -->
+      <a-rounded
+        radius="0.1"
+        color="#222"
+        height="1.4"
+        width="1.2"
+        position="1.2 1.5 0"
+        rotation="-90 0 0"
+        material="opacity: 0.93; shader: flat;"
+        shadow="receive: true">
+      </a-rounded>
+
+      <a-text
+        id="pokemon-stats"
+        value="HP: 45\nATK: 49\nDEF: 49\nSATK: 65\nSDEF: 65\nSPD: 45"
+        position="0.78 2 -0.01"
+        align="left"
+        color="#fff"
+        width="1"
+        font="kelsonsans"
+        white-space="pre"
+        line-height="45">
+      </a-text>
+
+      <!-- Descrição -->
+      <a-text
+        id="pokemon-description"
+        value="Este Pokémon armazena eletricidade em suas bochechas. Libera descargas elétricas quando está animado ou assustado."
+        position="0.1 1.1 -0.01"
+        align="left"
+        color="#333"
+        width="2.5"
+        wrap-count="45"
+        font="kelsonsans"
+        line-height="60">
+      </a-text>
+    </a-entity>
+  </a-marker>
+  <a-entity camera></a-entity>
+</a-scene>
+
+
+    <script>
+        window.addEventListener('load', () => {
+            const pokemonList = [
+                { name: "Bulbasaur", id: 1 }, { name: "Ivysaur", id: 2 }, { name: "Venusaur", id: 3 },
+                { name: "Charmander", id: 4 }, { name: "Charmeleon", id: 5 }, { name: "Charizard", id: 6 },
+                { name: "Squirtle", id: 7 }, { name: "Wartortle", id: 8 }, { name: "Blastoise", id: 9 },
+                { name: "Pikachu", id: 25 }, { name: "Jigglypuff", id: 39 }, { name: "Mewtwo", id: 150 },
+                { name: "Mew", id: 151 }, { name: "Snorlax", id: 143 }
+            ];
+
+            const marker = document.querySelector('#hiro-marker');
+            const pokemonCard = document.querySelector('#pokemon-card');
+            const pokemonImage = document.querySelector('#pokemon-image');
+            const pokemonName = document.querySelector('#pokemon-name');
+            const pokemonTypes = document.querySelector('#pokemon-types');
+            const pokemonHeightWeight = document.querySelector('#pokemon-height-weight');
+            const pokemonAbilities = document.querySelector('#pokemon-abilities');
+            const pokemonStats = document.querySelector('#pokemon-stats');
+            const pokemonDescription = document.querySelector('#pokemon-description');
+            const infoDiv = document.querySelector('#info');
+
+            marker.addEventListener('markerFound', () => {
+                const randomPokemon = pokemonList[Math.floor(Math.random() * pokemonList.length)];
+                
+                infoDiv.textContent = 'Analisando Pokémon...';
+                pokemonCard.setAttribute('visible', 'true');
+                pokemonName.setAttribute('value', 'Carregando...');
+                pokemonTypes.setAttribute('value', '');
+                pokemonHeightWeight.setAttribute('value', '');
+                pokemonAbilities.setAttribute('value', '');
+                pokemonStats.setAttribute('value', '');
+                pokemonDescription.setAttribute('value', '');
+                
+                fetch(`https://pokeapi.co/api/v2/pokemon/${randomPokemon.id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        pokemonImage.setAttribute('src', data.sprites.other['official-artwork'].front_default);
+                        
+                        const name = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+                        pokemonName.setAttribute('value', `#${data.id} ${name}`);
+
+                        const types = data.types.map(typeInfo => typeInfo.type.name.charAt(0).toUpperCase() + typeInfo.type.name.slice(1)).join(' / ');
+                        pokemonTypes.setAttribute('value', `Tipo: ${types}`);
+
+                        const height = (data.height * 0.1).toFixed(1);
+                        const weight = (data.weight * 0.1).toFixed(1);
+                        pokemonHeightWeight.setAttribute('value', `Altura: ${height} m\nPeso: ${weight} kg`);
+
+                        const abilities = data.abilities.map(abilityInfo => abilityInfo.ability.name.charAt(0).toUpperCase() + abilityInfo.ability.name.slice(1)).join(', ');
+                        pokemonAbilities.setAttribute('value', `Habilidades: ${abilities}`);
+
+                        const hp = data.stats.find(stat => stat.stat.name === 'hp').base_stat;
+                        const attack = data.stats.find(stat => stat.stat.name === 'attack').base_stat;
+                        const defense = data.stats.find(stat => stat.stat.name === 'defense').base_stat;
+                        const spAttack = data.stats.find(stat => stat.stat.name === 'special-attack').base_stat;
+                        const spDefense = data.stats.find(stat => stat.stat.name === 'special-defense').base_stat;
+                        const speed = data.stats.find(stat => stat.stat.name === 'speed').base_stat;
+                        pokemonStats.setAttribute('value', `HP: ${hp}\nATK: ${attack}\nDEF: ${defense}\nSATK: ${spAttack}\nSDEF: ${spDefense}\nSPD: ${speed}`);
+
+                        fetch(data.species.url)
+                            .then(response => response.json())
+                            .then(speciesData => {
+                                const flavorTextEntry = speciesData.flavor_text_entries.find(entry => entry.language.name === 'en');
+                                if (flavorTextEntry) {
+                                    pokemonDescription.setAttribute('value', flavorTextEntry.flavor_text.replace(/\n/g, ' '));
+                                } else {
+                                    pokemonDescription.setAttribute('value', 'Descrição não disponível.');
+                                }
+                                infoDiv.textContent = 'Toque no Pokémon para capturar!';
+                            })
+                            .catch(error => {
+                                console.error("Erro ao buscar descrição do Pokémon:", error);
+                                pokemonDescription.setAttribute('value', 'Descrição não disponível.');
+                                infoDiv.textContent = 'Erro ao carregar dados. Tente novamente.';
+                                pokemonCard.setAttribute('visible', 'false');
+                            });
+                    })
+                    .catch(error => {
+                        console.error("Erro ao buscar dados do Pokémon:", error);
+                        infoDiv.textContent = 'Erro ao carregar dados. Tente novamente.';
+                        pokemonCard.setAttribute('visible', 'false');
+                    });
+            });
+
+            marker.addEventListener('markerLost', () => {
+                pokemonCard.setAttribute('visible', 'false');
+                infoDiv.textContent = 'Aponte a câmera para o marcador HIRO';
+            });
+
+            pokemonImage.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const name = pokemonName.getAttribute('value').split(' ')[1] || "Pokémon";
+                alert(`✨ ${name} capturado!`);
+            });
+        });
+    </script>
+</body>
+</html>

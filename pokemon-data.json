@@ -1,0 +1,22 @@
+[
+  {
+    "id": 25,
+    "name": "Pikachu",
+    "description": "Pikachu armazena eletricidade nas bochechas e libera descargas elétricas quando está irritado.",
+    "moves": ["Thunder Shock", "Iron Tail"],
+    "strongAgainst": ["Water", "Flying"],
+    "weakAgainst": ["Ground"],
+    "bestVs": ["Squirtle", "Pidgey"],
+    "worstVs": ["Onix", "Golem"]
+  },
+  {
+    "id": 6,
+    "name": "Charizard",
+    "description": "Charizard cospe fogo quente o suficiente para derreter rochas. Conhecido por desafiar oponentes poderosos.",
+    "moves": ["Flamethrower", "Fly"],
+    "strongAgainst": ["Grass", "Bug"],
+    "weakAgainst": ["Water", "Rock"],
+    "bestVs": ["Bulbasaur", "Scyther"],
+    "worstVs": ["Blastoise", "Golem"]
+  }
+]
